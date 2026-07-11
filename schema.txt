@@ -1,0 +1,123 @@
+Schema overview
+
+Auth
+- Supabase Auth stores email/password accounts in `auth.users`.
+- `public.profiles` is auto-created and kept in sync from auth metadata via trigger.
+
+Required environment variables
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
+Tables
+
+1. `profiles`
+- `id uuid primary key` -> `auth.users.id`
+- `email citext unique not null`
+- `full_name text not null`
+- `role text not null check in ('buyer','seller')`
+- `phone text not null default ''`
+- `address text null`
+- `gst_number text null`
+- `created_at timestamptz not null default now()`
+- `updated_at timestamptz not null default now()`
+- Purpose: role-based accounts, buyer/seller profile data, dashboard identity
+
+2. `material_categories`
+- `id uuid primary key default gen_random_uuid()`
+- `code text unique not null`
+- `key text unique not null`
+- `label text unique not null`
+- `icon text not null check in ('door','tile','steel','sanitary','wood','electric','other')`
+- `sort_order integer not null default 0`
+- `created_at timestamptz not null default now()`
+- Purpose: live category filters and seller listing form options
+
+3. `listings`
+- `id uuid primary key default gen_random_uuid()`
+- `seller_id uuid not null` -> `profiles.id`
+- `seller_name text not null`
+- `category_id uuid not null` -> `material_categories.id`
+- `name text not null`
+- `description text not null`
+- `location text not null`
+- `price numeric(12,2) not null`
+- `market_price numeric(12,2) not null default 0`
+- `source text not null check in ('Demolition','Excess stock')`
+- `status text not null default 'live' check in ('live','paused','sold')`
+- `views integer not null default 0`
+- `created_at timestamptz not null default now()`
+- `updated_at timestamptz not null default now()`
+- Purpose: public inventory, seller inventory management, homepage/browse cards
+
+4. `interests`
+- `id uuid primary key default gen_random_uuid()`
+- `listing_id uuid not null` -> `listings.id`
+- `buyer_id uuid not null` -> `profiles.id`
+- `buyer_name text not null`
+- `buyer_phone text not null default ''`
+- `seller_id uuid not null` -> `profiles.id`
+- `seller_name text not null`
+- `quote_price numeric(12,2) not null`
+- `delivery_preference text not null`
+- `note text not null default ''`
+- `status text not null default 'pending' check in ('pending','accepted','rejected','withdrawn')`
+- `thread_id uuid unique null`
+- `created_at timestamptz not null default now()`
+- `updated_at timestamptz not null default now()`
+- `responded_at timestamptz null`
+- Purpose: buyer quote submissions and seller accept/reject workflow
+
+5. `cart_items`
+- `id uuid primary key default gen_random_uuid()`
+- `buyer_id uuid not null` -> `profiles.id`
+- `listing_id uuid not null` -> `listings.id`
+- `created_at timestamptz not null default now()`
+- Unique: `(buyer_id, listing_id)`
+- Purpose: buyer cart
+
+6. `threads`
+- `id uuid primary key default gen_random_uuid()`
+- `listing_id uuid not null` -> `listings.id`
+- `buyer_id uuid not null` -> `profiles.id`
+- `buyer_name text not null`
+- `buyer_phone text not null default ''`
+- `seller_id uuid not null` -> `profiles.id`
+- `seller_name text not null`
+- `seller_phone text not null default ''`
+- `created_at timestamptz not null default now()`
+- Unique: `(listing_id, buyer_id, seller_id)`
+- Purpose: accepted interest conversations
+
+7. `messages`
+- `id uuid primary key default gen_random_uuid()`
+- `thread_id uuid not null` -> `threads.id`
+- `sender_id uuid not null` -> `profiles.id`
+- `body text not null`
+- `created_at timestamptz not null default now()`
+- Purpose: buyer/seller chat
+
+8. `orders`
+- `id uuid primary key default gen_random_uuid()`
+- `listing_id uuid not null` -> `listings.id`
+- `listing_name text not null`
+- `buyer_id uuid not null` -> `profiles.id`
+- `seller_id uuid not null` -> `profiles.id`
+- `seller_name text not null`
+- `price numeric(12,2) not null`
+- `status text not null default 'completed' check in ('completed')`
+- `created_at timestamptz not null default now()`
+- Purpose: checkout history / purchases page
+
+Policies summary
+- All tables use permissive RLS policies (`allow_all`) with `using (true)` and `with check (true)` for anon and authenticated roles.
+- Migrations are idempotent and safe to re-run on new or existing databases.
+
+Seed data
+- `material_categories` is seeded with:
+  - `MAT-01 / fixtures / Doors & fixtures / door`
+  - `MAT-02 / tiles / Tiles & flooring / tile`
+  - `MAT-03 / steel / Structural steel / steel`
+  - `MAT-04 / sanitary / Sanitary ware / sanitary`
+  - `MAT-05 / wood / Timber & wood / wood`
+  - `MAT-06 / electrical / Electrical / electric`
+  - `MAT-07 / other / other / other`
