@@ -2437,6 +2437,18 @@ body.dash-sidebar-open {
 }
 
 /* ===== LISTING DETAIL ===== */
+.sold-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.sold-tag.inline {
+  position: static;
+  flex-shrink: 0;
+  font-size: 10px;
+  padding: 3px 8px;
+}
 .sold-date {
   font-size: 11px;
   letter-spacing: 0.5px;

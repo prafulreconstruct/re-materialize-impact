@@ -189,17 +189,13 @@ function Home() {
 
           <div className="cards" style={{ marginTop: 24 }}>
             {soldListings.map((l) => (
-              <div key={l.id} className="rc-card sold" onClick={() => navigate(`/listing/${l.id}`)}>
-                <ListingMedia
-                  imageUrls={l.imageUrls}
-                  icon={l.icon}
-                  name={l.name}
-                  source={l.source}
-                  sold
-                />
+              <div key={l.id} className="rc-card" onClick={() => navigate(`/listing/${l.id}`)}>
                 <div className="card-body">
-                  <div className="card-cat">
-                    {l.catCode} / {l.catLabel}
+                  <div className="sold-card-head">
+                    <div className="card-cat">
+                      {l.catCode} / {l.catLabel}
+                    </div>
+                    <span className="sold-tag inline">Sold</span>
                   </div>
                   <div className="card-name">{l.name}</div>
                   <div className="card-loc">{l.loc}</div>

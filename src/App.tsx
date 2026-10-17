@@ -67,6 +67,17 @@ function DocumentMeta() {
   return null;
 }
 
+// BrowserRouter keeps the old scroll position on navigation; start each new page at the top.
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 function NotFoundPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -118,6 +129,7 @@ export function App() {
       <RouteContextProvider value={{}}>
         <AppProvider>
           <DocumentMeta />
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/browse" element={<BrowsePage />} />
