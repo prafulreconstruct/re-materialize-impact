@@ -6,6 +6,9 @@ import { useApp, type Listing } from "@/lib/store";
 import { InterestDialog } from "@/components/interest-dialog";
 import { ListingMedia } from "@/components/listing-media";
 
+// Quotes received on the archived sold lots (closed before quotes were tracked in-app).
+const SOLD_LOT_QUOTES = 13;
+
 export const Route = createFileRoute("/")({
   component: Home,
 });
@@ -15,12 +18,19 @@ function Home() {
   const [filter, setFilter] = useState<string>("all");
   const [active, setActive] = useState<Listing | null>(null);
   const listings = state.listings.filter((l) => l.status === "live");
-  const visible = filter === "all" ? listings : listings.filter((l) => l.cat === filter);
-  const soldCount = state.purchases.length;
-  const totalSavings = state.purchases.reduce((sum, purchase) => {
-    const listing = state.listings.find((item) => item.id === purchase.listingId);
-    return sum + Math.max((listing?.market ?? purchase.price) - purchase.price, 0);
-  }, 0);
+  const soldListings = state.listings.filter((l) => l.status === "sold");
+  const shown = [...listings, ...soldListings];
+  const visible = filter === "all" ? shown : shown.filter((l) => l.cat === filter);
+  const soldIds = new Set(soldListings.map((l) => l.id));
+  const platformPurchases = state.purchases.filter((p) => !soldIds.has(p.listingId));
+  const soldCount = soldListings.length + platformPurchases.length;
+  const quoteCount = SOLD_LOT_QUOTES + state.interests.length;
+  const totalSavings =
+    soldListings.reduce((sum, l) => sum + Math.max(l.market - l.price, 0), 0) +
+    platformPurchases.reduce((sum, purchase) => {
+      const listing = state.listings.find((item) => item.id === purchase.listingId);
+      return sum + Math.max((listing?.market ?? purchase.price) - purchase.price, 0);
+    }, 0);
   const tickerItems = listings.slice(0, 8);
 
   return (
@@ -139,8 +149,18 @@ function Home() {
 
         <div className="cards">
           {visible.map((l) => (
-            <div key={l.id} className="rc-card" style={{ cursor: "default" }}>
-              <ListingMedia imageUrls={l.imageUrls} icon={l.icon} name={l.name} source={l.source} />
+            <div
+              key={l.id}
+              className={`rc-card ${l.status === "sold" ? "sold" : ""}`}
+              style={{ cursor: "default" }}
+            >
+              <ListingMedia
+                imageUrls={l.imageUrls}
+                icon={l.icon}
+                name={l.name}
+                source={l.source}
+                sold={l.status === "sold"}
+              />
               <div className="card-body">
                 <div className="card-cat">
                   {l.catCode} / {l.catLabel}
@@ -152,9 +172,15 @@ function Home() {
                     <span className="price">₹{l.price.toLocaleString("en-IN")}</span>
                     <span className="price-old">mkt ₹{l.market.toLocaleString("en-IN")}</span>
                   </div>
-                  <button className="wa" onClick={() => setActive(l)}>
-                    Show interest
-                  </button>
+                  {l.status === "sold" ? (
+                    <button className="wa" disabled>
+                      Sold
+                    </button>
+                  ) : (
+                    <button className="wa" onClick={() => setActive(l)}>
+                      Show interest
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -176,7 +202,7 @@ function Home() {
               <div className="log-lbl">Deals closed</div>
             </div>
             <div>
-              <div className="log-num">{state.interests.length}</div>
+              <div className="log-num">{quoteCount}</div>
               <div className="log-lbl">Quotes submitted</div>
             </div>
             <div>

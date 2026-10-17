@@ -684,6 +684,25 @@
 .src-tag.excess {
   background: var(--teak);
 }
+.sold-tag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  background: var(--orange);
+  color: var(--paper);
+}
+.rc-card.sold .listing-media-img,
+.rc-card.sold .listing-media-fallback {
+  filter: grayscale(0.6);
+  opacity: 0.75;
+}
 .card-body {
   padding: 16px 18px 18px;
   flex: 1;
@@ -746,6 +765,12 @@
 }
 .wa:hover {
   background: var(--orange);
+}
+.wa:disabled,
+.wa:disabled:hover {
+  background: var(--line);
+  color: var(--ink-soft);
+  cursor: not-allowed;
 }
 
 /* ===== LOGBOOK ===== */

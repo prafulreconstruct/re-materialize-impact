@@ -7,11 +7,13 @@ export function ListingMedia({
   icon,
   name,
   source,
+  sold = false,
 }: {
   imageUrls: string[];
   icon: CategoryIcon;
   name: string;
   source: string;
+  sold?: boolean;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const primaryImage = imageUrls[activeIndex];
@@ -23,6 +25,7 @@ export function ListingMedia({
   return (
     <div className="listing-media">
       <span className={`src-tag ${source === "Excess stock" ? "excess" : ""}`}>{source}</span>
+      {sold ? <span className="sold-tag">Sold</span> : null}
       {primaryImage ? (
         <img className="listing-media-img" src={primaryImage} alt={name} loading="lazy" />
       ) : (
