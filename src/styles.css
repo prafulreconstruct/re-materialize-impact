@@ -699,9 +699,7 @@
   color: var(--paper);
 }
 .rc-card.sold .listing-media-img,
-.rc-card.sold .listing-media-fallback,
-.detail-grid.sold .listing-media-img,
-.detail-grid.sold .listing-media-fallback {
+.rc-card.sold .listing-media-fallback {
   filter: grayscale(0.6);
   opacity: 0.75;
 }
@@ -2470,6 +2468,9 @@ body.dash-sidebar-open {
   gap: 40px;
   margin-top: 16px;
   align-items: start;
+}
+.detail-grid.sold {
+  grid-template-columns: minmax(0, 720px);
 }
 .detail-media {
   background: var(--card-bg);

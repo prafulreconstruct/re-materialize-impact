@@ -109,19 +109,23 @@ function ListingDetail() {
                 </div>
 
                 <div className={`detail-grid ${isSold ? "sold" : ""}`}>
-                  <div className="detail-media">
-                    <ListingMedia
-                      imageUrls={l.imageUrls}
-                      icon={l.icon}
-                      name={l.name}
-                      source={l.source}
-                      sold={isSold}
-                    />
-                  </div>
+                  {!isSold && (
+                    <div className="detail-media">
+                      <ListingMedia
+                        imageUrls={l.imageUrls}
+                        icon={l.icon}
+                        name={l.name}
+                        source={l.source}
+                      />
+                    </div>
+                  )}
 
                   <div>
-                    <div className="card-cat">
-                      {l.catCode} / {l.catLabel}
+                    <div className="sold-card-head">
+                      <div className="card-cat">
+                        {l.catCode} / {l.catLabel}
+                      </div>
+                      {isSold && <span className="sold-tag inline">Sold</span>}
                     </div>
                     <h2>{l.name}</h2>
 
