@@ -699,7 +699,9 @@
   color: var(--paper);
 }
 .rc-card.sold .listing-media-img,
-.rc-card.sold .listing-media-fallback {
+.rc-card.sold .listing-media-fallback,
+.detail-grid.sold .listing-media-img,
+.detail-grid.sold .listing-media-fallback {
   filter: grayscale(0.6);
   opacity: 0.75;
 }
@@ -2431,5 +2433,115 @@ body.dash-sidebar-open {
 @keyframes app-loader-spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* ===== LISTING DETAIL ===== */
+.sold-date {
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+.detail-back {
+  display: inline-block;
+  margin-bottom: 24px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 40px;
+  margin-top: 16px;
+  align-items: start;
+}
+.detail-media {
+  background: var(--card-bg);
+  border: 1px solid var(--line-strong);
+}
+.detail-media .listing-media {
+  height: 400px;
+  border-bottom: none;
+}
+.detail-media .listing-media-fallback svg {
+  width: 120px;
+  height: 120px;
+}
+.detail-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  margin-bottom: 20px;
+}
+.detail-price .price {
+  font-size: 26px;
+}
+.detail-price .price-old {
+  display: inline;
+  font-size: 13px;
+}
+.detail-save {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  color: var(--orange);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.detail-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+.detail-actions .wa {
+  flex: 1;
+  padding: 12px 16px;
+}
+.detail-note {
+  font-size: 14px;
+  color: var(--ink-soft);
+  padding: 12px 14px;
+  border: 1px dashed var(--line-strong);
+  margin-bottom: 28px;
+}
+.detail-specs {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  border-top: 1px solid var(--line-strong);
+}
+.detail-specs dt,
+.detail-specs dd {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+.detail-specs dt {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.detail-desc {
+  margin-top: 40px;
+  max-width: 720px;
+}
+.detail-desc p {
+  margin-top: 10px;
+  font-size: 15px;
+  line-height: 1.75;
+  white-space: pre-line;
+}
+@media (max-width: 860px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .detail-media .listing-media {
+    height: 280px;
   }
 }

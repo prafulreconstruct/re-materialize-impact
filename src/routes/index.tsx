@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useNavigate } from "@/lib/router-compat";
 import { useState } from "react";
 import { SiteNav, SiteFooter } from "@/components/site-nav";
 import { CatIcon } from "@/lib/listings-data";
@@ -17,10 +18,10 @@ function Home() {
   const { state } = useApp();
   const [filter, setFilter] = useState<string>("all");
   const [active, setActive] = useState<Listing | null>(null);
+  const navigate = useNavigate();
   const listings = state.listings.filter((l) => l.status === "live");
   const soldListings = state.listings.filter((l) => l.status === "sold");
-  const shown = [...listings, ...soldListings];
-  const visible = filter === "all" ? shown : shown.filter((l) => l.cat === filter);
+  const visible = filter === "all" ? listings : listings.filter((l) => l.cat === filter);
   const soldIds = new Set(soldListings.map((l) => l.id));
   const platformPurchases = state.purchases.filter((p) => !soldIds.has(p.listingId));
   const soldCount = soldListings.length + platformPurchases.length;
@@ -149,18 +150,8 @@ function Home() {
 
         <div className="cards">
           {visible.map((l) => (
-            <div
-              key={l.id}
-              className={`rc-card ${l.status === "sold" ? "sold" : ""}`}
-              style={{ cursor: "default" }}
-            >
-              <ListingMedia
-                imageUrls={l.imageUrls}
-                icon={l.icon}
-                name={l.name}
-                source={l.source}
-                sold={l.status === "sold"}
-              />
+            <div key={l.id} className="rc-card" onClick={() => navigate(`/listing/${l.id}`)}>
+              <ListingMedia imageUrls={l.imageUrls} icon={l.icon} name={l.name} source={l.source} />
               <div className="card-body">
                 <div className="card-cat">
                   {l.catCode} / {l.catLabel}
@@ -172,21 +163,65 @@ function Home() {
                     <span className="price">₹{l.price.toLocaleString("en-IN")}</span>
                     <span className="price-old">mkt ₹{l.market.toLocaleString("en-IN")}</span>
                   </div>
-                  {l.status === "sold" ? (
-                    <button className="wa" disabled>
-                      Sold
-                    </button>
-                  ) : (
-                    <button className="wa" onClick={() => setActive(l)}>
-                      Show interest
-                    </button>
-                  )}
+                  <button
+                    className="wa"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setActive(l);
+                    }}
+                  >
+                    Show interest
+                  </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
       </section>
+
+      {soldListings.length > 0 && (
+        <section className="section" style={{ paddingTop: 8 }}>
+          <div className="sheet-head">
+            <span className="sheet-no">SHT 02B / CLOSED DEALS</span>
+          </div>
+          <h2>Sold from the yard</h2>
+          <p className="section-sub">Lots that found a second site instead of a landfill.</p>
+
+          <div className="cards" style={{ marginTop: 24 }}>
+            {soldListings.map((l) => (
+              <div key={l.id} className="rc-card sold" onClick={() => navigate(`/listing/${l.id}`)}>
+                <ListingMedia
+                  imageUrls={l.imageUrls}
+                  icon={l.icon}
+                  name={l.name}
+                  source={l.source}
+                  sold
+                />
+                <div className="card-body">
+                  <div className="card-cat">
+                    {l.catCode} / {l.catLabel}
+                  </div>
+                  <div className="card-name">{l.name}</div>
+                  <div className="card-loc">{l.loc}</div>
+                  <div className="card-bottom">
+                    <div>
+                      <span className="price">₹{l.price.toLocaleString("en-IN")}</span>
+                      <span className="price-old">mkt ₹{l.market.toLocaleString("en-IN")}</span>
+                    </div>
+                    <span className="mono sold-date">
+                      {new Date(l.createdAt).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
       {active && <InterestDialog listing={active} onClose={() => setActive(null)} />}
 
       <div className="logbook">

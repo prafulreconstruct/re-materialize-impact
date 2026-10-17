@@ -153,7 +153,7 @@ type RawCategory = {
   sort_order: number | null;
 };
 
-type RawListing = {
+export type RawListing = {
   id: string;
   seller_id: string;
   seller_name: string;
@@ -281,7 +281,7 @@ function loadReadCursors(userId: string): Record<string, number> {
   }
 }
 
-const listingSelectWithImages = `
+export const listingSelectWithImages = `
   id,
   seller_id,
   seller_name,
@@ -353,7 +353,7 @@ function listingImageUrl(path: string) {
   return supabase.storage.from(LISTING_IMAGE_BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
-function mapListing(row: RawListing): Listing {
+export function mapListing(row: RawListing): Listing {
   return {
     id: row.id,
     sellerId: row.seller_id,

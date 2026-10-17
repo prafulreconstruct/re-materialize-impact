@@ -47,10 +47,7 @@ function Browse() {
   };
 
   const live = state.listings.filter((l) => l.status === "live");
-  const sold = state.listings.filter((l) => l.status === "sold");
-  const shown = [...live, ...sold];
-  const visible = filter === "all" ? shown : shown.filter((l) => l.cat === filter);
-  const liveVisible = visible.filter((l) => l.status === "live").length;
+  const visible = filter === "all" ? live : live.filter((l) => l.cat === filter);
   const myCart = currentUser ? (state.cart[currentUser.id] ?? []) : [];
   const activeCategory = state.categories.find((c) => c.key === filter);
 
@@ -97,7 +94,7 @@ function Browse() {
         <p className="section-sub">
           {filter === "all"
             ? 'Every listing verified and coded. Tap "Show interest" to submit a quote, or add to your cart.'
-            : `Showing live ${activeCategory?.label.toLowerCase() ?? "materials"} — ${liveVisible} listing${liveVisible === 1 ? "" : "s"} in this MAT code.`}
+            : `Showing live ${activeCategory?.label.toLowerCase() ?? "materials"} — ${visible.length} listing${visible.length === 1 ? "" : "s"} in this MAT code.`}
         </p>
 
         <div className="filter-row">
@@ -123,19 +120,13 @@ function Browse() {
         <div className="cards">
           {visible.map((l) => {
             const inCart = myCart.some((c) => c.listingId === l.id);
-            const isSold = l.status === "sold";
             return (
-              <div
-                key={l.id}
-                className={`rc-card ${isSold ? "sold" : ""}`}
-                style={{ cursor: "default" }}
-              >
+              <div key={l.id} className="rc-card" onClick={() => navigate(`/listing/${l.id}`)}>
                 <ListingMedia
                   imageUrls={l.imageUrls}
                   icon={l.icon}
                   name={l.name}
                   source={l.source}
-                  sold={isSold}
                 />
                 <div className="card-body">
                   <div className="card-cat">
@@ -153,37 +144,34 @@ function Browse() {
                       <span className="price">₹{l.price.toLocaleString("en-IN")}</span>
                       <span className="price-old">mkt ₹{l.market.toLocaleString("en-IN")}</span>
                     </div>
-                    {isSold ? (
-                      <button className="wa" disabled>
-                        Sold
+                    <div
+                      style={{ display: "flex", gap: 6 }}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <button className="wa" style={{ flex: 1 }} onClick={() => setActive(l)}>
+                        Show interest
                       </button>
-                    ) : (
-                      <div style={{ display: "flex", gap: 6 }}>
-                        <button className="wa" style={{ flex: 1 }} onClick={() => setActive(l)}>
-                          Show interest
+                      {currentUser?.role !== "seller" && (
+                        <button
+                          className="btn-mini"
+                          disabled={inCart || !currentUser}
+                          onClick={async () => {
+                            try {
+                              await addToCart(l.id);
+                            } catch (error) {
+                              alert(
+                                error instanceof Error
+                                  ? error.message
+                                  : "We couldn't add that item right now.",
+                              );
+                            }
+                          }}
+                          title={!currentUser ? "Log in to add to cart" : ""}
+                        >
+                          {inCart ? "✓ In cart" : "+ Cart"}
                         </button>
-                        {currentUser?.role !== "seller" && (
-                          <button
-                            className="btn-mini"
-                            disabled={inCart || !currentUser}
-                            onClick={async () => {
-                              try {
-                                await addToCart(l.id);
-                              } catch (error) {
-                                alert(
-                                  error instanceof Error
-                                    ? error.message
-                                    : "We couldn't add that item right now.",
-                                );
-                              }
-                            }}
-                            title={!currentUser ? "Log in to add to cart" : ""}
-                          >
-                            {inCart ? "✓ In cart" : "+ Cart"}
-                          </button>
-                        )}
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

@@ -4,6 +4,7 @@ import { AppProvider } from "./lib/store";
 import { RouteContextProvider } from "./lib/router-compat";
 import { Route as HomeRoute } from "./routes/index";
 import { Route as BrowseRoute } from "./routes/browse";
+import { Route as ListingRoute } from "./routes/listing.$id";
 import { Route as LoginRoute } from "./routes/login";
 import { Route as SignupRoute } from "./routes/signup";
 import { Route as PrivacyRoute } from "./routes/privacy";
@@ -30,6 +31,7 @@ const DEFAULT_DESCRIPTION =
 
 const headRegistry = [
   { path: "/browse", head: BrowseRoute.options.head },
+  { path: "/listing/:id", head: ListingRoute.options.head },
   { path: "/login", head: LoginRoute.options.head },
   { path: "/signup", head: SignupRoute.options.head },
   { path: "/privacy", head: PrivacyRoute.options.head },
@@ -89,6 +91,7 @@ function NotFoundPage() {
 
 const HomePage = HomeRoute.options.component!;
 const BrowsePage = BrowseRoute.options.component!;
+const ListingPage = ListingRoute.options.component!;
 const LoginPage = LoginRoute.options.component!;
 const SignupPage = SignupRoute.options.component!;
 const PrivacyPage = PrivacyRoute.options.component!;
@@ -118,6 +121,7 @@ export function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/browse" element={<BrowsePage />} />
+            <Route path="/listing/:id" element={<ListingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />

@@ -56,6 +56,7 @@ export function CatIcon({ kind }: { kind: CategoryIcon }) {
         </svg>
       );
     case "other":
+    default:
       return (
         <svg viewBox="0 0 48 48">
           <rect x="10" y="10" width="28" height="28" rx="4" />
